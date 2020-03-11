@@ -2,19 +2,27 @@ import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Asset, AppLoading } from "expo";
 
-export default function App() {
-    return (
-        <View style={styles.container}>
-            <Text>Open up App.js to start working on your app!</Text>
-        </View>
-    );
-}
+type AppState = {
+    ready: boolean
+};
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center"
+export default class App extends React.Component<{}, AppState> {
+    state = {
+        ready: false
+    };
+
+    async componentDidMount() {
+        await Promise.all(
+            profiles.map(profile => Asset.loadAsync(profile.profile))
+        );
+        this.setState({ ready: true });
     }
-});
+
+    render() {
+        const { ready } = this.state;
+        if (!ready) {
+            return <AppLoading />;
+        }
+        return <Profiles {...{ profiles }} />;
+    }
+}
